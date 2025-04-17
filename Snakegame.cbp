@@ -32,9 +32,17 @@
 			<Add option="-Wall" />
 			<Add option="-fexceptions" />
 		</Compiler>
+		<Unit filename="AudioManager.cpp" />
+		<Unit filename="AudioManager.h" />
+		<Unit filename="HightScoreManager.cpp" />
+		<Unit filename="HightScoreManager.h" />
 		<Unit filename="Snake.h" />
 		<Unit filename="Snanke.cpp" />
-		<Unit filename="Utilities.h" />
+		<Unit filename="TextureManeger.h" />
+		<Unit filename="Texturemanagere.cpp" />
+		<Unit filename="constants.h" />
+		<Unit filename="food.cpp" />
+		<Unit filename="food.h" />
 		<Unit filename="game.cpp" />
 		<Unit filename="game.h" />
 		<Unit filename="main.cpp" />

@@ -2,43 +2,40 @@
 #define GAME_H
 
 #include <SDL.h>
-#incldue <SDL_ttf.h>
-#include <vector>
+#include <SDL_ttf.h>
+#include "food.h"
+#include "Snake.h"
+#include "constants.h"
 
-enum FoodType { NOMAL, SPEED_BOOST };
+class Game {
+public:
+    //constructor khởi tạo
+    Game();
+    ~Game();//destructor giải phóng tài nguyên
 
-struct Food {
-    SDL_Point position;
-    FoodType type;
-    Unit32 spawnTime;
+    void init();// khởi tạo game
+    void run();//vòng lặp game
+    void clean();//giải phóng tài nguyên
+
+private:
+    void handleEvent();//xử lí sk
+    void update();//câppj nhật trnagj thái game
+    void render();//vẽ lên màn hình
+    void renderMenu();//vẽ menu
+    void renderPause();//vẽ màn hình páue
+    void renderGameOver();//vẽ màn hình game over
+    void renderSpeedBoostBar();//thanh hiển thị tăng tốc
+
+    SDL_Window* m_window;//cửa sổ game
+    SDL_Renderer* renderer;//Renderer để vẽ
+    TTF_Font* m_font;//font chữ hiển thị
+
+    Snake m_snake;//đối tượng con rắn
+    Food m_food;//thức ăn
+    GameState m_gameState;//trạng thái game
+
+    int m_score;//điểm số
+    bool m_running;//kiểm tra game đag chạy
 };
 
-struct GameSettings {
-    float speed = 0.1f;
-    int volume = 50;
-    bool mouseControl = false;
-    bool passWall = false;
-};
-
-struct GameState {
-    int currentScore = 0;
-    int hightScore = 0;
-    bool gameOver = false;
-};
-
-//ham khoi tao
-void initialize(SDL_Window*& window, SDL_Renderer*& renderer, TTF_Font*& font);
-
-//ham menu
-void showMainMenu(SDL_Renderer* renderer, GameSettings& settings, GameState& state, TTF_Font* font);
-void showGameOver(SDL_Renderer* rederer, GameState& state, TTF_Font* font);
-
-//hamf thuc an
-void spawnFood(Food& food, const std::vector<SDL_point>& snakeBody, FoodType type = NORMAL);
-void renderFood(SDL_Renderer* renderer, const SDL_Point& food);
-
-//ham tien ich
-void saveHighScore(int score);
-int loadHighScore();
-
-#endif // GAME_H
+#endif

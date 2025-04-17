@@ -1,10 +1,5 @@
 # depslib dependency file v1.0
-1743244466 source:d:\demosdl\demosdl\snakegame\main.cpp
-	"Game.h"
-	"Snake.h"
-	<SDL.h>
-	<iostream>
-	<ctime>
+1744114397 source:d:\demosdl\demosdl\snakegame\main.cpp
 
 1743267832 d:\demosdl\demosdl\snakegame\game.h
 	<SDL.h>
@@ -14,13 +9,15 @@
 	<SDL.h>
 	<vector>
 
-1743645652 source:d:\demosdl\demosdl\snakegame\game.cpp
-	"Game.h"
-	<cstdlib>
-	<ctime>
+1744114397 source:d:\demosdl\demosdl\snakegame\game.cpp
 
-1742318531 source:d:\demosdl\demosdl\snakegame\snanke.cpp
-	"Snake.h"
-	<cstdlib>
-	<ctime>
+1744114397 source:d:\demosdl\demosdl\snakegame\snanke.cpp
+
+1744111273 source:d:\demosdl\demosdl\snakegame\audiomanager.cpp
+
+1744111333 source:d:\demosdl\demosdl\snakegame\food.cpp
+
+1744111303 source:d:\demosdl\demosdl\snakegame\hightscoremanager.cpp
+
+1744111242 source:d:\demosdl\demosdl\snakegame\texturemanagere.cpp
 
