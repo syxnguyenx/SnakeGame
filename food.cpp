@@ -28,3 +28,23 @@ void Food::generateSpeedFood() {
     m_active = true;
     m_speedFoodTimer = SDL_GetTicks();
 }
+
+void food::render(SDL_Renderer* renderer) {
+    if(!m_active) return;
+
+    SDL_Rect rect = {m_position.x * GRID_SIZE, m_position.y * GRID_SIZE, GRID_SIZE, GRID_SIZE};
+    if(m_isSpeedFood) {
+        SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+    }else {
+        SDL_SetRenderDrawColor(renderer, 255, 255, 0, 255);
+    }
+    SDL_RenderFillRect(renderer, & rect);
+}
+
+void Food::update() {
+if(m_isSpeedFood && m_active) {
+    if(SDL_GetTicks() - m_speedFoodTimer > 5000) {
+        m_active = false;
+    }
+}
+}
