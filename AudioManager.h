@@ -8,7 +8,7 @@
 class AudioManager {
 public:
     //phương thức để lấy intance duy nhất
-    static AudioManager* Intance();
+    static AudioManager* Instance();
     //filePath: đường dẫn đến file âm thanh, id: tên định danh để truy xuất sau này
     bool loadSound(const std::string& filePath, const std::string& id);
     //filePath: đường dẫn đến file nhạc, id: tên đđịnh đanh dể sau này truy cập

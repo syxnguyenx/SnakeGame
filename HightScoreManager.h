@@ -8,7 +8,7 @@
 class HightScoreManager {
 public:
     //phương thức static để lấy intance duy nhất
-    static HightScoreManager* Intance();
+    static HightScoreManager* Instance();
     //tải điểm vào file
     void loadScore();
     //lưu điểm vào file
