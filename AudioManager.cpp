@@ -1,6 +1,5 @@
 #include "AudioManager.h"
-
-//
+#include <SDL_mixer.h>
 AudioManager* AudioManager::s_pInstance = nullptr;
 
 AudioManager* AudioManager::Instance() {

@@ -30,21 +30,35 @@
 		</Build>
 		<Compiler>
 			<Add option="-Wall" />
+			<Add option="-std=c++17" />
 			<Add option="-fexceptions" />
+			<Add directory="C:/Users/ADMINN/Downloads/SDL2_mixer-devel-2.8.0-mingw/SDL2_mixer-2.8.0/x86_64-w64-mingw32/include/SDL2" />
+			<Add directory="C:/Users/ADMINN/Downloads/SDL2_ttf-devel-2.22.0-mingw/SDL2_ttf-2.22.0/x86_64-w64-mingw32/include/SDL2" />
+			<Add directory="C:/Users/ADMINN/Downloads/SDL2_image-2.8.2/x86_64-w64-mingw32/include/SDL2" />
+			<Add directory="C:/Users/ADMINN/Downloads/SDL2-2.28.5/x86_64-w64-mingw32/include/SDL2" />
+			<Add directory="C:/Users/ADMINN/Downloads/SDL2_mixer-devel-2.8.0-mingw (1)/SDL2_mixer-2.8.0/x86_64-w64-mingw32/include/SDL2" />
 		</Compiler>
+		<Linker>
+			<Add option="-lmingw32 -lSDL2main -lSDL2 -lSDL2_image -lSDL2_mixer -lSDL2_ttf" />
+			<Add directory="C:/Users/ADMINN/Downloads/SDL2_mixer-devel-2.8.0-mingw/SDL2_mixer-2.8.0/x86_64-w64-mingw32/lib" />
+			<Add directory="C:/Users/ADMINN/Downloads/SDL2_ttf-devel-2.22.0-mingw/SDL2_ttf-2.22.0/x86_64-w64-mingw32/lib" />
+			<Add directory="C:/Users/ADMINN/Downloads/SDL2_image-2.8.2/x86_64-w64-mingw32/lib" />
+			<Add directory="C:/Users/ADMINN/Downloads/SDL2-2.28.5/x86_64-w64-mingw32/lib" />
+			<Add directory="C:/Users/ADMINN/Downloads/SDL2_mixer-devel-2.8.0-mingw (1)/SDL2_mixer-2.8.0/x86_64-w64-mingw32/lib" />
+		</Linker>
 		<Unit filename="AudioManager.cpp" />
 		<Unit filename="AudioManager.h" />
-		<Unit filename="HightScoreManager.cpp" />
-		<Unit filename="HightScoreManager.h" />
+		<Unit filename="Food.cpp" />
+		<Unit filename="Food.h" />
+		<Unit filename="Game.cpp" />
+		<Unit filename="Game.h" />
+		<Unit filename="HighScoreManager.cpp" />
+		<Unit filename="HighScoreManager.h" />
+		<Unit filename="Snake.cpp" />
 		<Unit filename="Snake.h" />
-		<Unit filename="Snanke.cpp" />
-		<Unit filename="TextureManeger.h" />
-		<Unit filename="Texturemanagere.cpp" />
+		<Unit filename="TextureManager.h" />
+		<Unit filename="Texturemanager.cpp" />
 		<Unit filename="constants.h" />
-		<Unit filename="food.cpp" />
-		<Unit filename="food.h" />
-		<Unit filename="game.cpp" />
-		<Unit filename="game.h" />
 		<Unit filename="main.cpp" />
 		<Extensions>
 			<lib_finder disable_auto="1" />

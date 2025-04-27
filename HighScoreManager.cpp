@@ -1,18 +1,20 @@
-#include "HightScoreManager.h"
+#include "HighScoreManager.h"
 #include <algorithm>
+#include <SDL_mixer.h>
+HighScoreManager* HighScoreManager::s_pInstance = nullptr;
 
-HightScoreManager* HightScoreManager::s_pInstance = nullptr;
-HightScoreManager* HightScoreManager::Instance() {
+HighScoreManager* HighScoreManager::Instance() {
     if(s_pInstance == nullptr) {
-        s_pInstance = new HightScoreManager();
+        s_pInstance = new HighScoreManager();
     }
     return s_pInstance;
 }
-HightScoreManager* HightScoreManager() {
-    loadScore();
+
+HighScoreManager::HighScoreManager() {
+    loadScores();
 }
 
-void HightScoreManager::loadScore() {
+void HighScoreManager::loadScores() {
     std::ifstream file(m_filePath, std::ios::binary);
     if(file.is_open()) {
         int score;
@@ -23,7 +25,7 @@ void HightScoreManager::loadScore() {
     }
 }
 
-void HightScoreManager::saveSocre() {
+void HighScoreManager::saveScores() {
     std::ofstream file(m_filePath, std::ios::binary);
     if(file.is_open()) {
         for(int score : m_scores) {
@@ -33,16 +35,16 @@ void HightScoreManager::saveSocre() {
     }
 }
 
-void HightScoreManager::addScore(int score) {
+void HighScoreManager::addScore(int score) {
     m_scores.push_back(score);
     std::sort(m_scores.rbegin(), m_scores.rend());
     if(m_scores.size() > 10) {
         m_scores.resize(10);
     }
-    saveSocre();
+    saveScores();
 }
 
-int HightScoreManager::getHightScore() const {
+int HighScoreManager::getHighScore() const {
     if(m_scores.empty()) return 0;
     return m_scores[0];
 }

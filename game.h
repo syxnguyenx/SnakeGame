@@ -3,39 +3,40 @@
 
 #include <SDL.h>
 #include <SDL_ttf.h>
-#include "food.h"
 #include "Snake.h"
-#include "constants.h"
+#include "Food.h"
+#include "Constants.h"
 
 class Game {
 public:
-    //constructor khởi tạo
     Game();
-    ~Game();//destructor giải phóng tài nguyên
+    ~Game();
 
-    void init();// khởi tạo game
-    void run();//vòng lặp game
-    void clean();//giải phóng tài nguyên
+    bool init();
+    void run();
+    void clean();
+    void resetGame();
+    void renderScore();
 
 private:
-    void handleEvent();//xử lí sk
-    void update();//câppj nhật trnagj thái game
-    void render();//vẽ lên màn hình
-    void renderMenu();//vẽ menu
-    void renderPause();//vẽ màn hình páue
-    void renderGameOver();//vẽ màn hình game over
-    void renderSpeedBoostBar();//thanh hiển thị tăng tốc
+    void handleEvents();
+    void update(float deltaTime);
+    void render();
+    void renderMenu();
+    void renderPause();
+    void renderGameOver();
+    void renderSpeedBoostBar();
 
-    SDL_Window* m_window;//cửa sổ game
-    SDL_Renderer* renderer;//Renderer để vẽ
-    TTF_Font* m_font;//font chữ hiển thị
+    SDL_Window* m_window;
+    SDL_Renderer* m_renderer;
+    TTF_Font* m_font;
 
-    Snake m_snake;//đối tượng con rắn
-    Food m_food;//thức ăn
-    GameState m_gameState;//trạng thái game
+    Snake m_snake;
+    Food m_food;
+    GameState m_gameState;
 
-    int m_score;//điểm số
-    bool m_running;//kiểm tra game đag chạy
+    int m_score;
+    bool m_running;
 };
 
 #endif
