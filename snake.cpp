@@ -115,4 +115,3 @@ bool Snake::checkFoodCollision(const SDL_Point& foodPos) const {
 Uint32 Snake::getSpeedBoostTimer() const {
     return m_speedBoostTimer;
 }
-

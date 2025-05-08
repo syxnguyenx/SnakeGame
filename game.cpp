@@ -41,7 +41,7 @@ bool Game::init() {
         return false;
     }
 
-    m_font = TTF_OpenFont("assets/fonts/arial.ttf", 24);
+    m_font = TTF_OpenFont("font.ttf", 24);
     if(!m_font) {
         std::cerr << "Failed to load font! Error: " << TTF_GetError() << std::endl;
         return false;
