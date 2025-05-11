@@ -3,25 +3,29 @@
 	"Game.h"
 	<SDL_mixer.h>
 
-1746668254 d:\demosdl\demosdl\snakegame\game.h
+1746984880 d:\demosdl\demosdl\snakegame\game.h
 	<SDL.h>
 	<SDL_ttf.h>
 	"Snake.h"
 	"Food.h"
 	"Constants.h"
+	<string>
+	<vector>
 
-1745343492 d:\demosdl\demosdl\snakegame\snake.h
+1746984880 d:\demosdl\demosdl\snakegame\snake.h
 	<vector>
 	<SDL.h>
 	"Constants.h"
+	<string>
 
-1746668288 source:d:\demosdl\demosdl\snakegame\game.cpp
+1746986346 source:d:\demosdl\demosdl\snakegame\game.cpp
 	"Game.h"
 	"HighScoreManager.h"
 	<SDL_mixer.h>
 	<SDL_ttf.h>
 	<SDL_image.h>
 	<iostream>
+	"TextureManager.h"
 
 1744114397 source:d:\demosdl\demosdl\snakegame\snanke.cpp
 
@@ -69,10 +73,14 @@
 	"Snake.h"
 	<SDL.h>
 
-1746668254 source:d:\demosdl\demosdl\snakegame\snake.cpp
+1746989454 source:d:\demosdl\demosdl\snakegame\snake.cpp
 	"Snake.h"
 	<SDL.h>
 	<SDL_mixer.h>
+	"TextureManager.h"
+	"Game.h"
+	<iostream>
+	<vector>
 
 1745453417 source:d:\demosdl\demosdl\snakegame\highscoremanager.cpp
 	"HighScoreManager.h"

@@ -6,6 +6,8 @@
 #include "Snake.h"
 #include "Food.h"
 #include "Constants.h"
+#include <string>
+#include <vector>
 
 class Game {
 public:
@@ -17,6 +19,7 @@ public:
     void clean();
     void resetGame();
     void renderScore();
+    void loadTextures();
 
 private:
     void handleEvents();
@@ -37,6 +40,15 @@ private:
 
     int m_score;
     bool m_running;
+
+    // Các ID và đường dẫn cho texture của rắn
+    std::vector<std::string> m_snakeHeadTextureIds;
+    std::vector<std::string> m_snakeBodyTextureIds;
+    std::vector<std::string> m_snakeTailTextureIds; // Thêm
+
+    std::vector<std::string> m_snakeHeadTexturePaths;
+    std::vector<std::string> m_snakeBodyTexturePaths;
+    std::vector<std::string> m_snakeTailTexturePaths; // Thêm
 };
 
 #endif
