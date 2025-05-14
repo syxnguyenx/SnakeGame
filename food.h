@@ -2,25 +2,35 @@
 #define FOOD_H
 
 #include <SDL.h>
-#include "Constants.h"
+
+enum FoodType {
+    BALL,
+    SPEED_BOOST
+};
 
 class Food {
 public:
-    Food();
-    void generateNormalFood();
-    void generateSpeedFood();
-    void render(SDL_Renderer* renderer);
+    Food(int gridWidth, int gridHeight);
+    ~Food();
+
     void update();
+    void render(SDL_Renderer* renderer);
 
     SDL_Point getPosition() const { return m_position; }
+    bool isActive() const { return m_isActive; }
     bool isSpeedFood() const { return m_isSpeedFood; }
-    bool isActive() const { return m_active; }
+    FoodType getType() const { return m_type; }
+
+    void generateFood();
+    void generateSpeedFood();
 
 private:
     SDL_Point m_position;
+    bool m_isActive;
     bool m_isSpeedFood;
-    bool m_active;
-    Uint32 m_speedFoodTimer;
+    int m_gridWidth;
+    int m_gridHeight;
+    FoodType m_type;
 };
 
-#endif
+#endif // FOOD_H

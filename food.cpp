@@ -1,56 +1,51 @@
 #include "Food.h"
-#include <SDL.h>
-#include <random>
-#include <SDL_mixer.h>
-Food::Food() : m_isSpeedFood(false), m_active(false) {}
+#include "TextureManager.h" // Đảm bảo include header này
+#include "Constants.h"
 
-void Food::generateNormalFood() {
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_int_distribution<> xDist(0, GRID_WIDTH - 1);
-    std::uniform_int_distribution<> yDist(0, GRID_HEIGHT - 1);
-
-    m_position.x = xDist(gen);
-    m_position.y = yDist(gen);
-    m_isSpeedFood = false;
-    m_active = true;
+Food::Food(int gridWidth, int gridHeight) :
+    m_position({0, 0}), // Khởi tạo mặc định hoặc bạn có thể tính toán
+    m_isActive(false),
+    m_isSpeedFood(false),
+    m_gridWidth(gridWidth),
+    m_gridHeight(gridHeight),
+    m_type(BALL)
+{
+    generateFood();
 }
 
-void Food::generateSpeedFood() {
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_int_distribution<> xDist(0, GRID_WIDTH - 1);
-    std::uniform_int_distribution<> yDist(0, GRID_HEIGHT - 1);
+Food::~Food() {}
 
-    m_position.x = xDist(gen);
-    m_position.y = yDist(gen);
-    m_isSpeedFood = true;
-    m_active = true;
-    m_speedFoodTimer = SDL_GetTicks();
+void Food::update() {
+    // Hiện tại không có logic cập nhật đặc biệt cho thức ăn
 }
 
 void Food::render(SDL_Renderer* renderer) {
-    if(!m_active) return;
-
-    SDL_Rect rect = {
-        m_position.x * GRID_SIZE,
-        m_position.y * GRID_SIZE,
-        GRID_SIZE,
-        GRID_SIZE
-    };
-
-    if(m_isSpeedFood) {
-        SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255); // Red for speed food
-    } else {
-        SDL_SetRenderDrawColor(renderer, 255, 255, 0, 255); // Yellow for normal food
+    if (m_isActive) {
+        std::string textureID;
+        switch (m_type) {
+            case BALL:
+                textureID = "ball"; // ID cho mồi thường
+                break;
+            case SPEED_BOOST:
+                textureID = "speed_food"; // <<< ID cho mồi tăng tốc (quả bóng đỏ)
+                break;
+        }
+        TextureManager::Instance()->draw(textureID, m_position.x * GRID_SIZE, m_position.y * GRID_SIZE, GRID_SIZE, GRID_SIZE, renderer);
     }
-    SDL_RenderFillRect(renderer, &rect);
 }
 
-void Food::update() {
-    if(m_isSpeedFood && m_active) {
-        if(SDL_GetTicks() - m_speedFoodTimer > 5000) { // 5 seconds
-            m_active = false;
-        }
-    }
+void Food::generateFood() {
+    m_position.x = rand() % m_gridWidth;
+    m_position.y = rand() % m_gridHeight;
+    m_isActive = true;
+    m_isSpeedFood = false;
+    m_type = BALL;
+}
+
+void Food::generateSpeedFood() {
+    m_position.x = rand() % m_gridWidth;
+    m_position.y = rand() % m_gridHeight;
+    m_isActive = true;
+    m_isSpeedFood = true;
+    m_type = SPEED_BOOST;
 }

@@ -12,7 +12,8 @@ Snake::Snake() :
     m_moveDelay(0.2f),
     m_normalDelay(0.2f),
     m_boostedDelay(0.1f),
-    m_speedBoosted(false)
+    m_speedBoosted(false),
+    m_justGrew(false)
 {
     reset();
 }
@@ -25,6 +26,7 @@ void Snake::reset() {
     m_direction = RIGHT;
     m_nextDirection = RIGHT;
     m_speedBoosted = false;
+    m_justGrew = false;
 }
 
 void Snake::handleInput(SDL_Event& event) {
@@ -46,12 +48,15 @@ void Snake::handleInput(SDL_Event& event) {
     }
 }
 
+// Snake.cpp
 void Snake::update() {
     static float moveTimer = 0;
-    float deltaTime = 0.016f;
-    moveTimer += deltaTime;
+    float currentMoveDelay = m_speedBoosted ? m_boostedDelay : m_normalDelay;
+    // float deltaTime = 0.016f; // Xem xét việc truyền deltaTime thực từ Game::update()
+    float actualDeltaTime = 0.016f; // Tạm thời giữ nguyên nếu bạn chưa muốn thay đổi lớn
+    moveTimer += actualDeltaTime;
 
-    if (moveTimer >= m_moveDelay) {
+    if (moveTimer >= currentMoveDelay) { // <<< ĐÃ SỬA: Dùng currentMoveDelay
         moveTimer = 0;
         m_direction = m_nextDirection;
 
@@ -63,13 +68,18 @@ void Snake::update() {
             case RIGHT: newHead.x++; break;
         }
 
+        // Xử lý xuyên tường
         if (newHead.x < 0) newHead.x = GRID_WIDTH - 1;
         if (newHead.x >= GRID_WIDTH) newHead.x = 0;
         if (newHead.y < 0) newHead.y = GRID_HEIGHT - 1;
         if (newHead.y >= GRID_HEIGHT) newHead.y = 0;
 
-        m_body.insert(m_body.begin(), newHead);
-        m_body.pop_back();
+        m_body.insert(m_body.begin(), newHead); // Thêm đầu mới
+
+        if (!m_justGrew) { // <<< THÊM LOGIC KIỂM TRA CỜ
+            m_body.pop_back(); // Chỉ xóa đuôi nếu không phải vừa lớn lên
+        }
+        m_justGrew = false; // Reset cờ cho lần update tiếp theo
     }
 
     if (m_speedBoosted && SDL_GetTicks() - m_speedBoostTimer > 3000) {
@@ -78,6 +88,10 @@ void Snake::update() {
 }
 
 void Snake::render(SDL_Renderer* renderer) {
+    if (m_body.empty()) { // Đề phòng trường hợp m_body rỗng
+        return;
+    }
+
     for (size_t i = 0; i < m_body.size(); ++i) {
         SDL_Rect rect = {
             m_body[i].x * GRID_SIZE,
@@ -104,8 +118,8 @@ void Snake::render(SDL_Renderer* renderer) {
             }
         } else if (i == m_body.size() - 1) {
             // Vẽ đuôi (tương tự như logic đầu, dựa trên hướng đốt cuối cùng)
-            Direction tailDir = getSegmentDirection(i - 1);
-            switch (tailDir) {
+            Direction dirToTail = getSegmentDirection(i);
+            switch (dirToTail) {
                 case UP:
                     TextureManager::Instance()->draw(tailTextureIds[0], rect.x, rect.y, rect.w, rect.h, renderer);
                     break;
@@ -118,43 +132,48 @@ void Snake::render(SDL_Renderer* renderer) {
                 case RIGHT:
                     TextureManager::Instance()->draw(tailTextureIds[3], rect.x, rect.y, rect.w, rect.h, renderer);
                     break;
+                default:
+                    TextureManager::Instance()->draw(tailTextureIds[3], rect.x, rect.y, rect.w, rect.h, renderer); break;
             }
-        } else {
-            // Vẽ thân - LOGIC THAY ĐỔI LỚN
+        } else { // Vẽ đốt thân ở giữa (body segment)
+
             Direction prevDir = getSegmentDirection(i - 1);
-            Direction currentDir = getSegmentDirection(i); // Hướng từ đốt i-1 đến đốt i
+            Direction currentDir = getSegmentDirection(i);
+            if (i == 1) { // Chỉ in ra cho đốt ngay sau đầu để dễ theo dõi
+                std::cout << "Dot i=1: prevDir=" << prevDir << ", currentDir=" << currentDir << std::endl;
+    }
 
             if (prevDir == currentDir) {
-                // Thân thẳng
-                if (prevDir == LEFT || prevDir == RIGHT) {
-                    TextureManager::Instance()->draw(bodyTextureIds[0], rect.x, rect.y, rect.w, rect.h, renderer); // horizontal
-                } else {
-                    TextureManager::Instance()->draw(bodyTextureIds[1], rect.x, rect.y, rect.w, rect.h, renderer); // vertical
-                }
-            } else {
-                // Thân cong
-                if ((prevDir == RIGHT && currentDir == DOWN) || (prevDir == UP && currentDir == LEFT)) {
-                    TextureManager::Instance()->draw(bodyTextureIds[6], rect.x, rect.y, rect.w, rect.h, renderer); // right down / up left
-                } else if ((prevDir == LEFT && currentDir == DOWN) || (prevDir == UP && currentDir == RIGHT)) {
-                    TextureManager::Instance()->draw(bodyTextureIds[7], rect.x, rect.y, rect.w, rect.h, renderer); // left down / up right
-                } else if ((prevDir == RIGHT && currentDir == UP) || (prevDir == DOWN && currentDir == LEFT)) {
-                    TextureManager::Instance()->draw(bodyTextureIds[8], rect.x, rect.y, rect.w, rect.h, renderer); // right up / down left
-                } else if ((prevDir == LEFT && currentDir == UP) || (prevDir == DOWN && currentDir == RIGHT)) {
-                    TextureManager::Instance()->draw(bodyTextureIds[9], rect.x, rect.y, rect.w, rect.h, renderer); // left up / down right
-                }
-                // Các trường hợp khúc cua khác (nếu cần, dựa trên "body_topleft", etc.)
-                else if ((prevDir == DOWN && currentDir == RIGHT) || (prevDir == LEFT && currentDir == UP)) {
-                    TextureManager::Instance()->draw(bodyTextureIds[2], rect.x, rect.y, rect.w, rect.h, renderer); // down right / left up
-                } else if ((prevDir == DOWN && currentDir == LEFT) || (prevDir == RIGHT && currentDir == UP)) {
-                    TextureManager::Instance()->draw(bodyTextureIds[3], rect.x, rect.y, rect.w, rect.h, renderer); // down left / right up
-                } else if ((prevDir == UP && currentDir == RIGHT) || (prevDir == LEFT && currentDir == DOWN)) {
-                    TextureManager::Instance()->draw(bodyTextureIds[4], rect.x, rect.y, rect.w, rect.h, renderer); // up right / left down
-                } else if ((prevDir == UP && currentDir == LEFT) || (prevDir == RIGHT && currentDir == DOWN)) {
-                    TextureManager::Instance()->draw(bodyTextureIds[5], rect.x, rect.y, rect.w, rect.h, renderer); // up left / right down
-                }
-            }
+        // Nếu hướng của đốt S[i-1] và hướng của đốt S[i] là giống nhau, rắn đi thẳng.
+        if (currentDir == LEFT || currentDir == RIGHT) { // Dùng currentDir hoặc prevDir đều được vì chúng bằng nhau
+            // std::cout << "      Ve than ngang (bodyTextureIds[0])" << std::endl;
+            TextureManager::Instance()->draw(bodyTextureIds[0], rect.x, rect.y, rect.w, rect.h, renderer); // body_horizontal
+        } else { // currentDir là UP hoặc DOWN
+            // std::cout << "      Ve than doc (bodyTextureIds[1])" << std::endl;
+            TextureManager::Instance()->draw(bodyTextureIds[1], rect.x, rect.y, rect.w, rect.h, renderer); // body_vertical
+        }
+    }  else { // Thân cong
+        std::cout << "   --> Dot i=" << i << " duoc coi la CONG. prevDir=" << prevDir << ", currentDir=" << currentDir << std::endl;
+        if ((prevDir == RIGHT && currentDir == UP) || (prevDir == DOWN && currentDir == LEFT)) {
+            std::cout << "      Chon body_topleft" << std::endl;
+            TextureManager::Instance()->draw(bodyTextureIds[2], rect.x, rect.y, rect.w, rect.h, renderer);
+        } else if ((prevDir == LEFT && currentDir == UP) || (prevDir == DOWN && currentDir == RIGHT)) {
+            std::cout << "      Chon body_topright" << std::endl;
+            TextureManager::Instance()->draw(bodyTextureIds[3], rect.x, rect.y, rect.w, rect.h, renderer);
+        } else if ((prevDir == RIGHT && currentDir == DOWN) || (prevDir == UP && currentDir == LEFT)) {
+            std::cout << "      Chon body_bottomleft" << std::endl;
+            TextureManager::Instance()->draw(bodyTextureIds[4], rect.x, rect.y, rect.w, rect.h, renderer);
+        } else if ((prevDir == LEFT && currentDir == DOWN) || (prevDir == UP && currentDir == RIGHT)) {
+            std::cout << "      Chon body_bottomright" << std::endl;
+            TextureManager::Instance()->draw(bodyTextureIds[5], rect.x, rect.y, rect.w, rect.h, renderer);
+        } else {
+            std::cout << "      !!! Khong khop dieu kien cua nao -> Ve mac dinh (body_horizontal)" << std::endl;
+            TextureManager::Instance()->draw(bodyTextureIds[0], rect.x, rect.y, rect.w, rect.h, renderer);
         }
     }
+}
+    }
+
 }
 
 Direction Snake::getSegmentDirection(size_t index) const {
@@ -163,13 +182,13 @@ Direction Snake::getSegmentDirection(size_t index) const {
     }
 
     if (m_body[index].x < m_body[index - 1].x) {
-        return RIGHT;
-    } else if (m_body[index].x > m_body[index - 1].x) {
         return LEFT;
+    } else if (m_body[index].x > m_body[index - 1].x) {
+        return RIGHT;
     } else if (m_body[index].y < m_body[index - 1].y) {
-        return DOWN;
-    } else if (m_body[index].y > m_body[index - 1].y) {
         return UP;
+    } else if (m_body[index].y > m_body[index - 1].y) {
+        return DOWN;
     }
 
     return m_direction; // Trường hợp không rõ ràng
@@ -178,10 +197,11 @@ Direction Snake::getSegmentDirection(size_t index) const {
 void Snake::grow() {
     SDL_Point tail = m_body.back();
     m_body.push_back(tail);
+    m_justGrew = true;
 }
 
 bool Snake::checkCollision() const {
-    for (size_t i = 1; i < m_body.size(); ++i) {
+     for (size_t i = 1; i < m_body.size(); ++i) {
         if (m_body[0].x == m_body[i].x && m_body[0].y == m_body[i].y) {
             return true;
         }

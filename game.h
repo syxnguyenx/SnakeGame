@@ -20,6 +20,8 @@ public:
     void resetGame();
     void renderScore();
     void loadTextures();
+    void renderPauseMenu();
+    void renderPauseButton();
 
 private:
     void handleEvents();
@@ -49,6 +51,15 @@ private:
     std::vector<std::string> m_snakeHeadTexturePaths;
     std::vector<std::string> m_snakeBodyTexturePaths;
     std::vector<std::string> m_snakeTailTexturePaths; // Thêm
+
+    SDL_Rect m_pauseButtonRect;
+    //SDL_Texture* m_pauseIconTexture;
+    std::string m_pauseIconID = "pause";
+    SDL_Rect m_resumeButtonMenuRect;
+    SDL_Rect m_replayButtonMenuRect;
+    SDL_Rect m_optionsButtonMenuRect;
+
+    void loadPauseButtonTexture();
 };
 
 #endif

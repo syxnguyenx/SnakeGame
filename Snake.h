@@ -39,6 +39,7 @@ private:
     Uint32 m_speedBoostTimer;
 
     Direction getSegmentDirection(std::vector<SDL_Point>::size_type index) const;
+    bool m_justGrew;
 };
 
 #endif
