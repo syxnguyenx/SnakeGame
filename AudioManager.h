@@ -15,12 +15,20 @@ public:
     void playMusic(const std::string& id, int loop = -1);
     void setSoundVolume(int volume);
     void setMusicVolume(int volume);
+    void toggleMuteAll(); // Bật/tắt toàn bộ âm thanh
+    bool isMuted() const;
+    void setGlobalVolume(int musicVolPercent, int sfxVolPercent); // Để Game class gọi khi khởi tạo hoặc thay đổi từ Options
 
 private:
     AudioManager();
     static AudioManager* s_pInstance;
     std::map<std::string, Mix_Chunk*> m_sfxs;
     std::map<std::string, Mix_Music*> m_music;
+    bool m_isMuted;
+    int m_currentMusicVolumePercent; // Lưu trữ mức % (0-100)
+    int m_currentSfxVolumePercent;   // Lưu trữ mức % (0-100)
+    int m_musicVolumeBeforeMute;
+    int m_sfxVolumeBeforeMute_chunkSpecific; // SDL_mixer không có global sfx volume, chỉ có per-chunk
 };
 
 #endif

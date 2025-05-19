@@ -3,14 +3,14 @@
 	"Game.h"
 	<SDL_mixer.h>
 
-1747211635 d:\demosdl\demosdl\snakegame\game.h
+1747664334 d:\demosdl\demosdl\snakegame\game.h
 	<SDL.h>
 	<SDL_ttf.h>
-	"Snake.h"
-	"Food.h"
-	"Constants.h"
 	<string>
 	<vector>
+	"Constants.h"
+	"Snake.h"
+	"Food.h"
 
 1747239436 d:\demosdl\demosdl\snakegame\snake.h
 	<vector>
@@ -18,20 +18,27 @@
 	"Constants.h"
 	<string>
 
-1747240436 source:d:\demosdl\demosdl\snakegame\game.cpp
+1747674833 source:d:\demosdl\demosdl\snakegame\game.cpp
 	"Game.h"
 	"HighScoreManager.h"
+	"TextureManager.h"
+	"AudioManager.h"
+	"Constants.h"
+	"Food.h"
 	<SDL_mixer.h>
 	<SDL_ttf.h>
 	<SDL_image.h>
 	<iostream>
-	"TextureManager.h"
+	<string>
+	<algorithm>
+	<vector>
 
 1744114397 source:d:\demosdl\demosdl\snakegame\snanke.cpp
 
-1745453406 source:d:\demosdl\demosdl\snakegame\audiomanager.cpp
+1747665265 source:d:\demosdl\demosdl\snakegame\audiomanager.cpp
 	"AudioManager.h"
 	<SDL_mixer.h>
+	<iostream>
 
 1747237899 source:d:\demosdl\demosdl\snakegame\food.cpp
 	"Food.h"
@@ -45,7 +52,7 @@
 1745317496 source:d:\demosdl\demosdl\snakegame\texturemanagere.cpp
 	"TextureManeger.h"
 
-1745317459 d:\demosdl\demosdl\snakegame\audiomanager.h
+1747431925 d:\demosdl\demosdl\snakegame\audiomanager.h
 	<SDL_mixer.h>
 	<string>
 	<map>
@@ -71,7 +78,7 @@
 	"Snake.h"
 	<SDL.h>
 
-1747248369 source:d:\demosdl\demosdl\snakegame\snake.cpp
+1747270514 source:d:\demosdl\demosdl\snakegame\snake.cpp
 	"Snake.h"
 	<SDL.h>
 	<SDL_mixer.h>

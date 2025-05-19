@@ -153,21 +153,15 @@ void Snake::render(SDL_Renderer* renderer) {
             TextureManager::Instance()->draw(bodyTextureIds[1], rect.x, rect.y, rect.w, rect.h, renderer); // body_vertical
         }
     }  else { // Thân cong
-        std::cout << "   --> Dot i=" << i << " duoc coi la CONG. prevDir=" << prevDir << ", currentDir=" << currentDir << std::endl;
         if ((prevDir == RIGHT && currentDir == UP) || (prevDir == DOWN && currentDir == LEFT)) {
-            std::cout << "      Chon body_topleft" << std::endl;
             TextureManager::Instance()->draw(bodyTextureIds[2], rect.x, rect.y, rect.w, rect.h, renderer);
         } else if ((prevDir == LEFT && currentDir == UP) || (prevDir == DOWN && currentDir == RIGHT)) {
-            std::cout << "      Chon body_topright" << std::endl;
             TextureManager::Instance()->draw(bodyTextureIds[3], rect.x, rect.y, rect.w, rect.h, renderer);
         } else if ((prevDir == RIGHT && currentDir == DOWN) || (prevDir == UP && currentDir == LEFT)) {
-            std::cout << "      Chon body_bottomleft" << std::endl;
             TextureManager::Instance()->draw(bodyTextureIds[4], rect.x, rect.y, rect.w, rect.h, renderer);
         } else if ((prevDir == LEFT && currentDir == DOWN) || (prevDir == UP && currentDir == RIGHT)) {
-            std::cout << "      Chon body_bottomright" << std::endl;
             TextureManager::Instance()->draw(bodyTextureIds[5], rect.x, rect.y, rect.w, rect.h, renderer);
         } else {
-            std::cout << "      !!! Khong khop dieu kien cua nao -> Ve mac dinh (body_horizontal)" << std::endl;
             TextureManager::Instance()->draw(bodyTextureIds[0], rect.x, rect.y, rect.w, rect.h, renderer);
         }
     }
