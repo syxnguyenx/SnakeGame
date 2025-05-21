@@ -38,21 +38,19 @@ bool TextureManager::load(const std::string& filePath, const std::string& id, SD
 
 // Định nghĩa hàm draw (đã sửa để trả về bool)
 bool TextureManager::draw(const std::string& id, int x, int y, int width, int height,
-                          SDL_Renderer* renderer, SDL_RendererFlip flip) {
+                          SDL_Renderer* renderer,
+                          const SDL_Rect* srcRect,
+                          double angle,
+                          SDL_Point* center,
+                          SDL_RendererFlip flip) {
     auto it = m_textureMap.find(id);
     if (it == m_textureMap.end() || it->second == nullptr) {
-        // std::cerr << "Warning: TextureManager::draw: Texture with ID '" << id << "' not found or is null." << std::endl;
+        // std::cerr << "Warning: TextureManager::draw: Texture voi ID '" << id << "' khong tim thay." << std::endl;
         return false;
     }
-    SDL_Texture* texture = it->second;
-    SDL_Rect srcRect;
-    if (SDL_QueryTexture(texture, NULL, NULL, &srcRect.w, &srcRect.h) != 0) {
-        return false;
-    }
-    srcRect.x = 0;
-    srcRect.y = 0;
+    SDL_Texture* texture_pointer_tu_map = it->second;
     SDL_Rect destRect = {x, y, width, height};
-    SDL_RenderCopyEx(renderer, texture, &srcRect, &destRect, 0, nullptr, flip);
+    SDL_RenderCopyEx(renderer, texture_pointer_tu_map, srcRect, &destRect, angle, center, flip);
     return true;
 }
 

@@ -19,7 +19,8 @@ enum Direction {
     UP,
     DOWN,
     LEFT,
-    RIGHT
+    RIGHT,
+    UNKNOWN_DIRECTION
 };
 
 #endif

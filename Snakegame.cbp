@@ -58,8 +58,11 @@
 		<Unit filename="Snake.h" />
 		<Unit filename="TextureManager.h" />
 		<Unit filename="Texturemanager.cpp" />
+		<Unit filename="Vector2D.h" />
 		<Unit filename="constants.h" />
 		<Unit filename="main.cpp" />
+		<Unit filename="tail.cpp" />
+		<Unit filename="tail.h" />
 		<Extensions>
 			<lib_finder disable_auto="1" />
 		</Extensions>

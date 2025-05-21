@@ -3,30 +3,81 @@
 #include <SDL_mixer.h>
 #include "TextureManager.h"
 #include "Game.h"
+#include "tail.h"
 #include <iostream>
 #include <vector>
 
 Snake::Snake() :
+    m_headPosition({0,0}), // Sẽ được đặt lại trong reset() hoặc Setup()
     m_direction(RIGHT),
     m_nextDirection(RIGHT),
-    m_moveDelay(0.2f),
+    m_moveTimer(0.0f), // Khởi tạo m_moveTimer
     m_normalDelay(0.2f),
     m_boostedDelay(0.1f),
     m_speedBoosted(false),
-    m_justGrew(false)
+    m_speedBoostTimer(0),
+    // m_justGrew(false), // Không cần nếu Tails xử lý tốt
+    m_gridSize(GRID_SIZE), // Giả sử GRID_SIZE được định nghĩa trong Constants.h
+    m_texHeadUp(nullptr),   // Khởi tạo các con trỏ texture là nullptr
+    m_texHeadDown(nullptr),
+    m_texHeadLeft(nullptr),
+    m_texHeadRight(nullptr)
 {
-    reset();
+    std::cout << "Snake constructor called." << std::endl;
 }
 
+Snake::~Snake() {
+    // Giải phóng texture đầu rắn
+    if (m_texHeadUp) SDL_DestroyTexture(m_texHeadUp);
+    if (m_texHeadDown) SDL_DestroyTexture(m_texHeadDown);
+    if (m_texHeadLeft) SDL_DestroyTexture(m_texHeadLeft);
+    if (m_texHeadRight) SDL_DestroyTexture(m_texHeadRight);
+    // m_tails sẽ tự gọi destructor của nó (Tails::~Tails() sẽ gọi FreeTexture())
+}
+// Snake.cpp
+void Snake::Setup(SDL_Renderer* renderer,
+                  const std::string& headPath, // Đường dẫn cho ảnh đầu
+                  const std::string& tailBodyPath,
+                  const std::string& tailEndPath,
+                  const std::string& tailCurvePath,
+                  const std::string& tailCurveEndPath) {
+    this->m_renderer_snake = renderer;
+    this->m_gridSize = GRID_SIZE; // Hoặc giá trị bạn muốn
+
+    m_headTextureID = "snake_head"; // Đặt ID
+    if (!TextureManager::Instance()->load(headPath, m_headTextureID, renderer)) {
+        std::cerr << "Loi load texture dau ran: " << headPath << std::endl;
+    }
+
+    // Gọi Tails::Setup
+    m_tails.Setup(renderer,
+                  /* bodyPath cho body.png */ "body.png", "tails_body_straight",
+                  /* tailPath cho last_tail.png */ "last_tail.png", "tails_last_straight",
+                  /* curvePath cho curve.png */ "curve.png", "tails_body_curve",
+                  /* curveTailPath cho curve_tail.png */ "curve_tail.png", "tails_curve_end",
+                  3, this->m_gridSize);
+    reset();
+}
+// Snake.cpp
 void Snake::reset() {
-    m_body.clear();
-    m_body.push_back({5, 5});
-    m_body.push_back({4, 5});
-    m_body.push_back({3, 5});
     m_direction = RIGHT;
     m_nextDirection = RIGHT;
     m_speedBoosted = false;
-    m_justGrew = false;
+    m_speedBoostTimer = 0;
+    m_moveTimer = 0.0f;
+
+   m_headPosition.x = static_cast<int>(5.0f * m_gridSize);
+    m_headPosition.y = static_cast<int>(5.0f * m_gridSize);
+    m_direction = RIGHT;
+    m_nextDirection = RIGHT;
+    // ...
+
+    int initialTailSegments = 3;
+    m_tails.InitializeBody(m_headPosition, convertDirectionToAngle(m_direction), initialTailSegments, m_gridSize);
+
+    for (int i = 0; i < m_tails.getTotalSegments(); ++i) {
+        Vector2D segPos = m_tails.getSegmentPosition(i);
+    }
 }
 
 void Snake::handleInput(SDL_Event& event) {
@@ -50,36 +101,34 @@ void Snake::handleInput(SDL_Event& event) {
 
 // Snake.cpp
 void Snake::update() {
-    static float moveTimer = 0;
-    float currentMoveDelay = m_speedBoosted ? m_boostedDelay : m_normalDelay;
-    // float deltaTime = 0.016f; // Xem xét việc truyền deltaTime thực từ Game::update()
-    float actualDeltaTime = 0.016f; // Tạm thời giữ nguyên nếu bạn chưa muốn thay đổi lớn
-    moveTimer += actualDeltaTime;
+    m_moveTimer += 0.016f; // Giả sử vẫn dùng fixed delta time cho logic di chuyển
+    float currentActualMoveDelay = m_speedBoosted ? m_boostedDelay : m_normalDelay;
 
-    if (moveTimer >= currentMoveDelay) { // <<< ĐÃ SỬA: Dùng currentMoveDelay
-        moveTimer = 0;
+    if (m_moveTimer >= currentActualMoveDelay) {
+        m_moveTimer = 0.0f;
         m_direction = m_nextDirection;
 
-        SDL_Point newHead = m_body.front();
+        // Lưu vị trí đầu cũ để các đốt thân theo sau
+        Vector2D oldHeadPosition = m_headPosition;
+        int oldHeadAngle = convertDirectionToAngle(m_direction); // Góc của đầu trước khi nó di chuyển theo hướng mới này
+
+        // Cập nhật vị trí đầu rắn mới
         switch (m_direction) {
-            case UP:    newHead.y--; break;
-            case DOWN:  newHead.y++; break;
-            case LEFT:  newHead.x--; break;
-            case RIGHT: newHead.x++; break;
+            case UP:    m_headPosition.y -= m_gridSize; break;
+            case DOWN:  m_headPosition.y += m_gridSize; break;
+            case LEFT:  m_headPosition.x -= m_gridSize; break;
+            case RIGHT: m_headPosition.x += m_gridSize; break;
         }
 
-        // Xử lý xuyên tường
-        if (newHead.x < 0) newHead.x = GRID_WIDTH - 1;
-        if (newHead.x >= GRID_WIDTH) newHead.x = 0;
-        if (newHead.y < 0) newHead.y = GRID_HEIGHT - 1;
-        if (newHead.y >= GRID_HEIGHT) newHead.y = 0;
+        // Xử lý xuyên tường cho đầu rắn
+        if (m_headPosition.x < 0) m_headPosition.x = (GRID_WIDTH - 1) * m_gridSize;
+        else if (m_headPosition.x >= SCREEN_WIDTH) m_headPosition.x = 0;
+        if (m_headPosition.y < 0) m_headPosition.y = (GRID_HEIGHT - 1) * m_gridSize;
+        else if (m_headPosition.y >= SCREEN_HEIGHT) m_headPosition.y = 0;
 
-        m_body.insert(m_body.begin(), newHead); // Thêm đầu mới
-
-        if (!m_justGrew) { // <<< THÊM LOGIC KIỂM TRA CỜ
-            m_body.pop_back(); // Chỉ xóa đuôi nếu không phải vừa lớn lên
-        }
-        m_justGrew = false; // Reset cờ cho lần update tiếp theo
+        // Ra lệnh cho các đốt thân/đuôi (Tails) di chuyển theo vị trí ĐẦU CŨ và GÓC CŨ
+        // Vì đốt thân đầu tiên sẽ di chuyển vào vị trí mà đầu rắn vừa rời đi.
+        m_tails.MoveBody(oldHeadPosition, oldHeadAngle);
     }
 
     if (m_speedBoosted && SDL_GetTicks() - m_speedBoostTimer > 3000) {
@@ -87,87 +136,25 @@ void Snake::update() {
     }
 }
 
+// Snake.cpp
 void Snake::render(SDL_Renderer* renderer) {
-    if (m_body.empty()) { // Đề phòng trường hợp m_body rỗng
-        return;
+    // 1. Vẽ thân và đuôi do Tails quản lý
+    m_tails.Render(renderer); // Gọi hàm Render đã sửa của Tails
+
+    // 2. Vẽ đầu rắn (luôn ở trên cùng)
+    double headAngle = static_cast<double>(convertDirectionToAngle(m_direction));
+    SDL_RendererFlip headFlip = SDL_FLIP_NONE; // Đầu rắn thường không cần lật
+
+    if (!m_headTextureID.empty()) { // m_headTextureID là ID của "snake.png"
+        TextureManager::Instance()->draw(m_headTextureID,
+                                         (int)m_headPosition.x, (int)m_headPosition.y,
+                                         m_gridSize, m_gridSize,
+                                         renderer, nullptr, headAngle, nullptr, headFlip);
+    } else {
+        SDL_Rect headDestRect = {(int)m_headPosition.x, (int)m_headPosition.y, m_gridSize, m_gridSize};
+        SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+        SDL_RenderFillRect(renderer, &headDestRect);
     }
-
-    for (size_t i = 0; i < m_body.size(); ++i) {
-        SDL_Rect rect = {
-            m_body[i].x * GRID_SIZE,
-            m_body[i].y * GRID_SIZE,
-            GRID_SIZE,
-            GRID_SIZE
-        };
-
-        if (i == 0) {
-            // Vẽ đầu (không thay đổi)
-            switch (m_direction) {
-                case UP:
-                    TextureManager::Instance()->draw(headTextureIds[0], rect.x, rect.y, rect.w, rect.h, renderer);
-                    break;
-                case DOWN:
-                    TextureManager::Instance()->draw(headTextureIds[1], rect.x, rect.y, rect.w, rect.h, renderer);
-                    break;
-                case LEFT:
-                    TextureManager::Instance()->draw(headTextureIds[2], rect.x, rect.y, rect.w, rect.h, renderer);
-                    break;
-                case RIGHT:
-                    TextureManager::Instance()->draw(headTextureIds[3], rect.x, rect.y, rect.w, rect.h, renderer);
-                    break;
-            }
-        } else if (i == m_body.size() - 1) {
-            // Vẽ đuôi (tương tự như logic đầu, dựa trên hướng đốt cuối cùng)
-            Direction dirToTail = getSegmentDirection(i);
-            switch (dirToTail) {
-                case UP:
-                    TextureManager::Instance()->draw(tailTextureIds[0], rect.x, rect.y, rect.w, rect.h, renderer);
-                    break;
-                case DOWN:
-                    TextureManager::Instance()->draw(tailTextureIds[1], rect.x, rect.y, rect.w, rect.h, renderer);
-                    break;
-                case LEFT:
-                    TextureManager::Instance()->draw(tailTextureIds[2], rect.x, rect.y, rect.w, rect.h, renderer);
-                    break;
-                case RIGHT:
-                    TextureManager::Instance()->draw(tailTextureIds[3], rect.x, rect.y, rect.w, rect.h, renderer);
-                    break;
-                default:
-                    TextureManager::Instance()->draw(tailTextureIds[3], rect.x, rect.y, rect.w, rect.h, renderer); break;
-            }
-        } else { // Vẽ đốt thân ở giữa (body segment)
-
-            Direction prevDir = getSegmentDirection(i - 1);
-            Direction currentDir = getSegmentDirection(i);
-            if (i == 1) { // Chỉ in ra cho đốt ngay sau đầu để dễ theo dõi
-                std::cout << "Dot i=1: prevDir=" << prevDir << ", currentDir=" << currentDir << std::endl;
-    }
-
-            if (prevDir == currentDir) {
-        // Nếu hướng của đốt S[i-1] và hướng của đốt S[i] là giống nhau, rắn đi thẳng.
-        if (currentDir == LEFT || currentDir == RIGHT) { // Dùng currentDir hoặc prevDir đều được vì chúng bằng nhau
-            // std::cout << "      Ve than ngang (bodyTextureIds[0])" << std::endl;
-            TextureManager::Instance()->draw(bodyTextureIds[0], rect.x, rect.y, rect.w, rect.h, renderer); // body_horizontal
-        } else { // currentDir là UP hoặc DOWN
-            // std::cout << "      Ve than doc (bodyTextureIds[1])" << std::endl;
-            TextureManager::Instance()->draw(bodyTextureIds[1], rect.x, rect.y, rect.w, rect.h, renderer); // body_vertical
-        }
-    }  else { // Thân cong
-        if ((prevDir == RIGHT && currentDir == UP) || (prevDir == DOWN && currentDir == LEFT)) {
-            TextureManager::Instance()->draw(bodyTextureIds[2], rect.x, rect.y, rect.w, rect.h, renderer);
-        } else if ((prevDir == LEFT && currentDir == UP) || (prevDir == DOWN && currentDir == RIGHT)) {
-            TextureManager::Instance()->draw(bodyTextureIds[3], rect.x, rect.y, rect.w, rect.h, renderer);
-        } else if ((prevDir == RIGHT && currentDir == DOWN) || (prevDir == UP && currentDir == LEFT)) {
-            TextureManager::Instance()->draw(bodyTextureIds[4], rect.x, rect.y, rect.w, rect.h, renderer);
-        } else if ((prevDir == LEFT && currentDir == DOWN) || (prevDir == UP && currentDir == RIGHT)) {
-            TextureManager::Instance()->draw(bodyTextureIds[5], rect.x, rect.y, rect.w, rect.h, renderer);
-        } else {
-            TextureManager::Instance()->draw(bodyTextureIds[0], rect.x, rect.y, rect.w, rect.h, renderer);
-        }
-    }
-}
-    }
-
 }
 
 Direction Snake::getSegmentDirection(size_t index) const {
@@ -189,22 +176,62 @@ Direction Snake::getSegmentDirection(size_t index) const {
 }
 
 void Snake::grow() {
-    SDL_Point tail = m_body.back();
-    m_body.push_back(tail);
-    m_justGrew = true;
+    m_tails.Grow(); // Gọi hàm Grow của Tails
 }
 
-bool Snake::checkCollision() const {
-     for (size_t i = 1; i < m_body.size(); ++i) {
-        if (m_body[0].x == m_body[i].x && m_body[0].y == m_body[i].y) {
+bool Snake::checkCollisionWithSelf() {
+    // ... (các std::cout debug) ...
+    Vector2D headPos = getHeadPosition();
+    for (int i = 0; i < m_tails.getTotalSegments(); ++i) {
+        Vector2D segmentPos = m_tails.getSegmentPosition(i);
+        if (headPos.x == segmentPos.x && headPos.y == segmentPos.y) {
+            std::cout << "   !!! VA CHAM VOI THAN TAI DOT " << i << " CUA TAILS !!!"
+                      << " Dau (" << headPos.x << "," << headPos.y << ")"
+                      << " vs Dot (" << segmentPos.x << "," << segmentPos.y << ")" << std::endl;
             return true;
         }
     }
     return false;
 }
 
-bool Snake::checkFoodCollision(const SDL_Point& foodPos) const {
-    return (m_body[0].x == foodPos.x && m_body[0].y == foodPos.y);
+
+bool Snake::checkFoodCollision(const SDL_Point& foodPos) {
+    int headGridX = m_headPosition.x / GRID_SIZE;
+    int headGridY = m_headPosition.y / GRID_SIZE;
+
+    return (headGridX == foodPos.x && headGridY == foodPos.y);
+}
+
+Vector2D Snake::getHeadPosition() const {
+    return m_headPosition;
+}
+
+int Snake::convertDirectionToAngle(Direction dir) {
+    switch (dir) {
+        case UP:    return 270; // Hoặc -90, tùy thuộc vào TextureManager::draw và ảnh của bạn
+        case DOWN:  return 90;
+        case LEFT:  return 180;
+        case RIGHT: return 0;
+        default:    return 0;
+    }
+}
+
+// Trong tail.cpp (hoặc file chứa hàm này)
+// (Đảm bảo UNKNOWN_DIRECTION đã được thêm vào enum Direction trong Constants.h)
+
+void Snake::increaseSpeed() {
+    m_speedBoosted = true;
+    m_speedBoostTimer = SDL_GetTicks(); // SDL_GetTicks() cần <SDL.h> đã được include
+    std::cout << "Snake::increaseSpeed() called. m_speedBoosted = " << m_speedBoosted << std::endl;
+}
+
+void Snake::resetSpeed() {
+    m_speedBoosted = false;
+    std::cout << "Snake::resetSpeed() called. m_speedBoosted = " << m_speedBoosted << std::endl;
+}
+
+bool Snake::isSpeedBoosted() const {
+    return m_speedBoosted;
 }
 
 Uint32 Snake::getSpeedBoostTimer() const {

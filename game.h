@@ -1,91 +1,84 @@
-// Game.h
 #ifndef GAME_H
 #define GAME_H
 
-#include <SDL.h>       // Cho SDL_Rect, SDL_Window, SDL_Renderer, SDL_Color etc.
-#include <SDL_ttf.h>   // Cho TTF_Font
+#include <SDL.h>
+#include <SDL_ttf.h>
 #include <string>
 #include <vector>
-#include "Constants.h" // Cho GameState, SCREEN_WIDTH, SCREEN_HEIGHT etc.
-#include "Snake.h"
+#include "Constants.h" // Cho GameState, SCREEN_WIDTH, SCREEN_HEIGHT, GRID_SIZE, Direction, UNKNOWN_DIRECTION
 #include "Food.h"
-// #include "AudioManager.h" // Nếu bạn cần truy cập trực tiếp
+
+// Forward declaration để tránh include vòng nếu Snake.h có thể cần Game.h
+class Snake;
+class AudioManager;     // Forward declare nếu không include đầy đủ
+class TextureManager; // Forward declare nếu không include đầy đủ
 
 class Game {
 public:
     Game();
-    ~Game();
+    ~Game(); // Quan trọng: Sẽ giải phóng m_snake
 
     bool init();
     void run();
-    void renderPauseMenu();   // Khai báo các hàm render menu
-    void renderOptionsMenu();
+    void clean(); // Sẽ giải phóng m_snake
+
+    // Các hàm này có thể vẫn hữu ích
+    void resetGame();
     void renderScore();
-    // void renderTextOnButtonHelper(const std::string& text, const SDL_Rect& buttonRect, SDL_Color color); // Nếu là private member
+    // void loadTextures(); // Hàm này có thể không cần nữa nếu Snake và Tails tự load texture trong Setup
 
 private:
     void handleEvents();
     void update(float deltaTime);
     void render();
+    void loadTextures();
+    // Các hàm render giao diện
     void renderMenu();
+    void renderPauseMenu();
+    void renderOptionsMenu();
     void renderGameOver();
     void renderSpeedBoostBar();
-    void renderPauseButton();
-    void loadPauseButtonTexture(); // Nếu bạn dùng
-    void loadTextures();
-    void resetGame();
-    void clean(); // Bạn nên có hàm clean để giải phóng tài nguyên
+    void renderPauseButton(); // Nút pause trên màn hình game
 
-    // Các thành viên hiện có của bạn
+    // Hàm tiện ích để vẽ chữ (nên là private member)
+    void renderTextOnButtonHelper(const std::string& text, const SDL_Rect& buttonRect, SDL_Color color);
+
     SDL_Window* m_window;
     SDL_Renderer* m_renderer;
     TTF_Font* m_font;
 
-    Snake m_snake;
     Food m_food;
-    GameState m_gameState;
+    Snake* m_snake; // <<<< SỬ DỤNG CON TRỎ
 
+    GameState m_gameState;
     int m_score;
     bool m_running;
 
-    std::vector<std::string> m_snakeHeadTextureIds;
-    std::vector<std::string> m_snakeBodyTextureIds;
-    std::vector<std::string> m_snakeTailTextureIds;
-
-    std::vector<std::string> m_snakeHeadTexturePaths;
-    std::vector<std::string> m_snakeBodyTexturePaths;
-    std::vector<std::string> m_snakeTailTexturePaths;
-
+    // ID cho icon nút Pause (nếu bạn dùng cách lưu ID)
     std::string m_pauseIconID;
 
-    // Cho nút Pause trên màn hình game
-    SDL_Rect m_pauseButtonRect;
-    // std::string m_pauseIconID; // Hoặc SDL_Texture* m_pauseIconTexture;
-
-    // Cho các nút trong Pause Menu
+    // Biến cho các nút trong Pause Menu
+    SDL_Rect m_pauseButtonRect;       // Nút Pause trên màn hình chơi
     SDL_Rect m_resumeButtonMenuRect;
     SDL_Rect m_replayButtonMenuRect;
-    SDL_Rect m_optionsButtonMenuRect; // Nút "Options" để mở Options Menu
+    SDL_Rect m_optionsButtonMenuRect;
 
-    // ====> CÁC KHAI BÁO QUAN TRỌNG CHO OPTIONS MENU (ĐẢM BẢO BẠN ĐÃ THÊM NHỮNG DÒNG NÀY) <====
-    int m_currentMusicVolume;        // Lưu trữ mức âm lượng nhạc hiện tại (0-100)
-    int m_currentSfxVolume;          // Lưu trữ mức âm lượng SFX hiện tại (0-100)
-    SDL_Rect m_musicVolUpButtonRect;    // Nút tăng âm lượng nhạc
-    SDL_Rect m_musicVolDownButtonRect;  // Nút giảm âm lượng nhạc
-    SDL_Rect m_sfxVolUpButtonRect;      // Nút tăng âm lượng SFX
-    SDL_Rect m_sfxVolDownButtonRect;    // Nút giảm âm lượng SFX
-    SDL_Rect m_optionsBackButtonRect;   // Nút "Back" trong Options Menu
+    // Biến cho Options Menu
+    int m_currentMusicVolume;
+    int m_currentSfxVolume;
+    SDL_Rect m_musicVolUpButtonRect;
+    SDL_Rect m_musicVolDownButtonRect;
+    SDL_Rect m_sfxVolUpButtonRect;
+    SDL_Rect m_sfxVolDownButtonRect;
+    SDL_Rect m_optionsBackButtonRect;
 
-    // Cho nút Restart ở Game Over Menu
+    // Biến cho Game Over Menu
     SDL_Rect m_gameOverRestartButtonRect;
 
-    // Cho nút Mute/Unmute ở Main Menu
+    // Biến cho Main Menu
     SDL_Rect m_muteButtonRect_MainMenu;
-
-    SDL_Texture* m_soundOnTexture;  // <<<< THÊM
-    SDL_Texture* m_soundOffTexture; // <<<< THÊM
-    // Nếu bạn muốn renderTextOnButtonHelper là một phương thức private của Game:
-    void renderTextOnButtonHelper(const std::string& text, const SDL_Rect& buttonRect, SDL_Color color);
+    std::string m_soundOnIconID;  // ID cho icon sound on
+    std::string m_soundOffIconID; // ID cho icon sound off
 };
 
 #endif // GAME_H

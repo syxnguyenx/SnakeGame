@@ -3,28 +3,30 @@
 	"Game.h"
 	<SDL_mixer.h>
 
-1747664334 d:\demosdl\demosdl\snakegame\game.h
+1747821142 d:\demosdl\demosdl\snakegame\game.h
 	<SDL.h>
 	<SDL_ttf.h>
 	<string>
 	<vector>
 	"Constants.h"
-	"Snake.h"
 	"Food.h"
 
-1747239436 d:\demosdl\demosdl\snakegame\snake.h
+1747810079 d:\demosdl\demosdl\snakegame\snake.h
 	<vector>
 	<SDL.h>
 	"Constants.h"
 	<string>
+	"tail.h"
+	"Vector2D.h"
 
-1747674833 source:d:\demosdl\demosdl\snakegame\game.cpp
+1747843314 source:d:\demosdl\demosdl\snakegame\game.cpp
 	"Game.h"
+	"Snake.h"
+	"tail.h"
+	"Vector2D.h"
 	"HighScoreManager.h"
 	"TextureManager.h"
 	"AudioManager.h"
-	"Constants.h"
-	"Food.h"
 	<SDL_mixer.h>
 	<SDL_ttf.h>
 	<SDL_image.h>
@@ -32,6 +34,7 @@
 	<string>
 	<algorithm>
 	<vector>
+	<cstdlib>
 
 1744114397 source:d:\demosdl\demosdl\snakegame\snanke.cpp
 
@@ -66,7 +69,7 @@
 1747126819 d:\demosdl\demosdl\snakegame\food.h
 	<SDL.h>
 
-1747209425 d:\demosdl\demosdl\snakegame\constants.h
+1747760198 d:\demosdl\demosdl\snakegame\constants.h
 
 1745317505 d:\demosdl\demosdl\snakegame\texturemaneger.h
 	<SDL.h>
@@ -78,12 +81,13 @@
 	"Snake.h"
 	<SDL.h>
 
-1747270514 source:d:\demosdl\demosdl\snakegame\snake.cpp
+1747832637 source:d:\demosdl\demosdl\snakegame\snake.cpp
 	"Snake.h"
 	<SDL.h>
 	<SDL_mixer.h>
 	"TextureManager.h"
 	"Game.h"
+	"tail.h"
 	<iostream>
 	<vector>
 
@@ -98,12 +102,12 @@
 	<algorithm>
 	<vector>
 
-1747237899 source:d:\demosdl\demosdl\snakegame\texturemanager.cpp
+1747842166 source:d:\demosdl\demosdl\snakegame\texturemanager.cpp
 	"TextureManager.h"
 	<SDL_mixer.h>
 	<iostream>
 
-1747233828 d:\demosdl\demosdl\snakegame\texturemanager.h
+1747842312 d:\demosdl\demosdl\snakegame\texturemanager.h
 	<SDL.h>
 	<SDL_image.h>
 	<string>
@@ -531,4 +535,33 @@
 	"SDL_version.h"
 	"begin_code.h"
 	"close_code.h"
+
+1747816391 d:\demosdl\demosdl\snakegame\tail.h
+	<vector>
+	<string>
+	<SDL.h>
+	"Vector2D.h"
+	"Constants.h"
+
+1747793970 d:\demosdl\demosdl\snakegame\vector2d.h
+	<iostream>
+	<string>
+
+1747844821 source:d:\demosdl\demosdl\snakegame\tail.cpp
+	"tail.h"
+	"TextureManager.h"
+	"Constants.h"
+	"Vector2D.h"
+	"Utils.h"
+	<cmath>
+	<SDL.h>
+
+1747817995 source:d:\demosdl\demosdl\snakegame\utils.cpp
+	"Utils.h"
+	<cmath>
+	<iostream>
+
+1747817406 d:\demosdl\demosdl\snakegame\utils.h
+	"Vector2D.h"
+	"Constants.h"
 
